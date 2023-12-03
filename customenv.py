@@ -149,7 +149,7 @@ class Customenv():
         delta_score=info['score']-self.score
         self.score=info['score']
         # reward=deltacoins*10+deltatime+delta_x
-        reward=delta_x*5+deltatime
+        reward=delta_x+deltatime*0.5
         reward+=np.log(delta_coins) if delta_coins>0 else 0
         reward+=np.log(delta_score) if delta_score>0 else 0
         if info['flag_get']:

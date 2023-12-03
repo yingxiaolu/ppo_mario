@@ -89,7 +89,7 @@ class CustomRewardAndDoneEnv(gym.Wrapper):
 class Customenv():
     def __init__(self,render=False):
         STAGE_NAME = 'SuperMarioBros-1-3-v0'
-        MOVEMENT = [ ['right', 'A', 'B'],['left', 'A'], ['right', 'B']]
+        MOVEMENT = [ ['right', 'A', 'B'],['left', 'A'], ['right'],["A"],['NOOP']]
         env = gym_super_mario_bros.make(STAGE_NAME)
         env = JoypadSpace(env, MOVEMENT)
         self.info=env.unwrapped._get_info()
@@ -110,7 +110,7 @@ class Customenv():
         # self.action_space=self.env.action_space
         # self.num_states=self.state.shape[0]
         # self.num_actions=self.action_space.n
-        self.max_x_pos=0
+
         self._reinit__()
         
     def custom_reset(self):
@@ -129,6 +129,7 @@ class Customenv():
         self.coins=self.info['coins']
         # self.deltacoins=0
         self.x_pos=self.info['x_pos']
+        self.max_x_pos=self.x_pos
         # self.delta_x=0
     
     def custom_step(self,action):
@@ -149,7 +150,9 @@ class Customenv():
         delta_score=info['score']-self.score
         self.score=info['score']
         # reward=deltacoins*10+deltatime+delta_x
-        reward=delta_x+deltatime
+        exceed_xpos=max(0,info['x_pos']-self.max_x_pos)
+        self.max_x_pos=max(self.max_x_pos,info['x_pos'])
+        reward=exceed_xpos
         reward+=np.log(delta_coins) if delta_coins>0 else 0
         reward+=np.log(delta_score) if delta_score>0 else 0
         if info['flag_get']:

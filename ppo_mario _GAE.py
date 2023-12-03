@@ -25,16 +25,16 @@ MAX_TIMESTEP_TEST = 1000
 
 
 LEARNING_RATE = 0.00001 #学习率
-# GAE = 1.0   # 控制优势估计的偏差和方差
+GAE = 1.0   # 控制优势估计的偏差和方差
 ENT_COEF = 0.01 # Entropy Coefficient
 GAMMA = 0.9#单帧奖励计算折扣
 # LAMBDA = 0.95
 # TAU=1.0 #控制GAE的偏差和方差
 EPSILON = 0.1 # 裁剪范围
-BATCH_SIZE = 600 #一个batch内游戏次数
+BATCH_SIZE = 200 #一个batch内游戏次数
 EPOCHS = 10000 # Number of Epochs
 N_EPOCHS=10 #训练完一个batch后再迭代跟新的次数
-WARM_UP=1 #在训练初期, 非常容易死, 导致单次帧很少, 此时加大batch_size.
+WARM_UP=3 #在训练初期, 非常容易死, 导致单次帧很少, 此时加大batch_size.
 
 ic() 
 
@@ -52,7 +52,7 @@ model_path='./model.pth'
 if os.path.exists(model_path):
     model=torch.load(model_path)
 else:
-    model=PPO(1,5).to(device)
+    model=PPO(1,3).to(device)
 # model=PPO(1,7).to(device)
 # for name, param in model.named_parameters():
 #     print(f"Parameter name: {name}, Device: {param.device}")
@@ -64,12 +64,10 @@ optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 final_x_pos_list=[]
 timesteps_list=[]
 avge_final_xpos_in_one_batch=[]
-
 def get_batchs_data(env,batch_size=BATCH_SIZE):
     '''
     一次从头到尾跑完一趟游戏, 多趟组成一个batchs
     '''
-    global final_x_pos_list,timesteps_list,avge_final_xpos_in_one_batch
     batch_obs, batch_acts, batch_log_probs,batch_rews, rewards, batch_lens,batch_vals,dones=[],[],[],[],[],[],[],[]
     final_state=None
     batch_final_x_pos=[]
@@ -108,7 +106,6 @@ def get_batchs_data(env,batch_size=BATCH_SIZE):
         timesteps_list.append(len(timesteps))
         batch_lens.append(len(timesteps))
         batch_rews.append(ep_rews)
-        
     final_x_pos_list+=batch_final_x_pos
     avge_final_xpos_in_one_batch.append(np.mean(batch_final_x_pos))
     batch_rtgs=[]

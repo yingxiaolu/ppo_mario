@@ -2,7 +2,7 @@ from icecream import ic
 import sys
 import torch
 import gym_super_mario_bros
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 from ppo_model import PPO
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # device='cpu'
@@ -119,18 +119,18 @@ def get_batchs_data(env,batch_size=BATCH_SIZE):
     batch_vals=torch.tensor(batch_vals,dtype=torch.float).to(device)
     
     ic(avge_xpos_in_one_batch[-1])
-    plt.figure(figsize=(8*8,8*2))
-    plt.subplot(3,1,1)
-    plt.plot(final_x_pos_list,color='red')
-    plt.legend(['final_x_pos'])
-    plt.subplot(3,1,2)
-    plt.plot(timesteps_list,color='blue')
-    plt.legend(['timesteps'])
-    plt.subplot(3,1,3)
-    plt.plot(avge_xpos_in_one_batch,color='green')
-    plt.legend(['avge_xpos_in_one_batch'])
-    plt.savefig('./info.png')
-    plt.close()
+    # plt.figure(figsize=(8*8,8*2))
+    # plt.subplot(3,1,1)
+    # plt.plot(final_x_pos_list,color='red')
+    # plt.legend(['final_x_pos'])
+    # plt.subplot(3,1,2)
+    # plt.plot(timesteps_list,color='blue')
+    # plt.legend(['timesteps'])
+    # plt.subplot(3,1,3)
+    # plt.plot(avge_xpos_in_one_batch,color='green')
+    # plt.legend(['avge_xpos_in_one_batch'])
+    # plt.savefig('./info.png')
+    # plt.close()
     
     return batch_obs, batch_acts, batch_log_probs,batch_rtgs, rewards, batch_lens,batch_vals,dones
       

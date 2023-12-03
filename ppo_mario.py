@@ -8,7 +8,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # device='cpu'
 import torch.nn.functional as F
 from customenv import Customenv
-from torch.distributions import Categorical
+from torch.distributions import Categorical,MultivariateNormal
 env=Customenv()
 import os
 import numpy as np
@@ -34,7 +34,7 @@ EPSILON = 0.1 # 裁剪范围
 BATCH_SIZE = 200 #一个batch内游戏次数
 EPOCHS = 10000 # Number of Epochs
 N_EPOCHS=10 #训练完一个batch后再迭代跟新的次数
-WARM_UP=4 #在训练初期, 非常容易死, 导致单次帧很少, 此时加大batch_size.
+WARM_UP=1 #在训练初期, 非常容易死, 导致单次帧很少, 此时加大batch_size.
 
 ic() 
 
@@ -55,6 +55,8 @@ model=PPO(1,3).to(device)
 #     print(f"Parameter name: {name}, Device: {param.device}")
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 # critic_optimizer = torch.optim.Adam(critic.parameters(), lr=LEARNING_RATE)
+# cov_var = torch.full(size=(3,), fill_value=0.5).to(device)
+# cov_mat = torch.diag(cov_var).to(device)
 
 final_x_pos_list=[]
 timesteps_list=[]
@@ -82,13 +84,12 @@ def get_batchs_data(env,batch_size=BATCH_SIZE):
             logits,value=model(state)
             # print(logits)
             batch_vals.append(value)
-            policy=F.softmax(logits.detach(),dim=1)
-            # print(policy)
-            old_m = Categorical(policy)
-            action=old_m.sample()
-            # print(action)
+            policy=F.softmax(logits,dim=1)#.detach()
+            dist = Categorical(policy)
+            action=dist.sample()
+            log_prob=dist.log_prob(action)
             batch_acts.append(action)
-            batch_log_probs.append(old_m.log_prob(action))
+            batch_log_probs.append(log_prob)
             state,reward,done,info=env.custom_step(action.item())
             # ic(action.item())
             # ic(reward)
@@ -151,17 +152,22 @@ def train():
         # print(batch_vals[l:r])
         # print(rewards[l:r])
         
-        A_k=batch_rtgs-batch_vals
+        A_k=batch_rtgs-batch_vals.detach()
         # print(A_k[l:r])
         A_k = (A_k - A_k.mean()) / (A_k.std() + 1e-10)
         # print(A_k[l:r])
         # sys.exit()
         for nepoch in range(N_EPOCHS):
             logits, value = model(batch_obs)
+            
             policy = F.softmax(logits, dim=1)
             m = Categorical(policy)
-            new_log_probs = m.log_prob(batch_acts)
-            ratio = torch.exp(new_log_probs - batch_log_probs)
+            log_probs = m.log_prob(batch_acts)
+            
+            # dist=MultivariateNormal(logits,cov_mat)
+            # log_probs=dist.log_prob(batch_acts)
+            
+            ratio = torch.exp(log_probs - batch_log_probs)
             # ic(policy[:20])
             # ic(new_log_probs[:20])
             # ic(logits.shape,policy.shape,new_log_probs.shape,ratio.shape)

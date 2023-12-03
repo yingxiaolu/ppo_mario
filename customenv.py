@@ -149,7 +149,7 @@ class Customenv():
         delta_score=info['score']-self.score
         self.score=info['score']
         # reward=deltacoins*10+deltatime+delta_x
-        reward=delta_x+deltatime*0.5
+        reward=delta_x+deltatime
         reward+=np.log(delta_coins) if delta_coins>0 else 0
         reward+=np.log(delta_score) if delta_score>0 else 0
         if info['flag_get']:
@@ -158,7 +158,7 @@ class Customenv():
         #     self.max_x_pos=info['x_pos']
         # reward+=np.log(info['x_pos'])/40 if info['x_pos']!=0 else 0 #相同图像应该采取相同措施, 不应该加这个, 和动作不相关
         if self.done and info['time']>0 and info['flag_get']==False: #摔死的,碰死的
-            reward-=30
+            reward-=500
         # if self.done and info['time']==0: #如果时间到了但是没到终点
         #     reward-=10
         # if delta_x<=0.0:#如果没动

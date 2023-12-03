@@ -2,7 +2,7 @@ from icecream import ic
 import sys
 import torch
 import gym_super_mario_bros
-# from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 from ppo_model import PPO
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # device='cpu'
@@ -24,7 +24,7 @@ EPISODE_NUMBERS = 20
 MAX_TIMESTEP_TEST = 1000
 
 
-LEARNING_RATE = 0.0001 #学习率
+LEARNING_RATE = 0.00001 #学习率
 GAE = 1.0   # 控制优势估计的偏差和方差
 ENT_COEF = 0.01 # Entropy Coefficient
 GAMMA = 0.9#单帧奖励计算折扣
@@ -67,13 +67,14 @@ def get_batchs_data(env,batch_size=BATCH_SIZE):
     '''
     batch_obs, batch_acts, batch_log_probs,batch_rews, rewards, batch_lens,batch_vals,dones=[],[],[],[],[],[],[],[]
     final_state=None
+    batch_x_poss=[]
     for i in range(batch_size):
         state = env.custom_reset()
         info= env.info
         done=False
         timesteps=[]
         ep_rews=[]
-        x_poss=[]
+
         while not done:
             state=state[:,:,:,-1].copy()
             state=np.expand_dims(state,axis=0)
@@ -97,11 +98,11 @@ def get_batchs_data(env,batch_size=BATCH_SIZE):
             rewards.append(reward)
             ep_rews.append(reward)
             timesteps.append(1)
-            x_poss.append(info['x_pos'])
+            batch_x_poss.append(info['x_pos'])
         # ic(len(timesteps))
         final_x_pos_list.append(info['x_pos'])
         timesteps_list.append(len(timesteps))
-        avge_xpos_in_one_batch.append(np.mean(x_poss))
+        avge_xpos_in_one_batch.append(np.mean(batch_x_poss))
         batch_lens.append(len(timesteps))
         batch_rews.append(ep_rews)
     
@@ -119,18 +120,18 @@ def get_batchs_data(env,batch_size=BATCH_SIZE):
     batch_vals=torch.tensor(batch_vals,dtype=torch.float).to(device)
     
     ic(avge_xpos_in_one_batch[-1])
-    # plt.figure(figsize=(8*8,8*2))
-    # plt.subplot(3,1,1)
-    # plt.plot(final_x_pos_list,color='red')
-    # plt.legend(['final_x_pos'])
-    # plt.subplot(3,1,2)
-    # plt.plot(timesteps_list,color='blue')
-    # plt.legend(['timesteps'])
-    # plt.subplot(3,1,3)
-    # plt.plot(avge_xpos_in_one_batch,color='green')
-    # plt.legend(['avge_xpos_in_one_batch'])
-    # plt.savefig('./info.png')
-    # plt.close()
+    plt.figure(figsize=(8*8,8*2))
+    plt.subplot(3,1,1)
+    plt.plot(final_x_pos_list,color='red')
+    plt.legend(['final_x_pos'])
+    plt.subplot(3,1,2)
+    plt.plot(timesteps_list,color='blue')
+    plt.legend(['timesteps'])
+    plt.subplot(3,1,3)
+    plt.plot(avge_xpos_in_one_batch,color='green')
+    plt.legend(['avge_xpos_in_one_batch'])
+    plt.savefig('./info.png')
+    plt.close()
     
     return batch_obs, batch_acts, batch_log_probs,batch_rtgs, rewards, batch_lens,batch_vals,dones
       
@@ -207,14 +208,15 @@ def test():
         # ic(state.shape)
         state=np.expand_dims(state,axis=0)
         batch_obs.append(state)
-        logits,_=actor(torch.FloatTensor(state).to(device))
+        logits,_=model(torch.FloatTensor(state).to(device))
         # print(logits)
-        batch_vals.append(value.detach())
+        # batch_vals.append(value.detach())
         policy=F.softmax(logits.detach(),dim=1)
         #得到policy中,值最大的下标
         action=torch.argmax(policy)
         state,reward,done,info=env.custom_step(action.item())
-        time.sleep(0.5)
+        ic(reward,info,action)
+        time.sleep(2)
 
 # if __name__ == '__main__':
 #     fire.Fire()

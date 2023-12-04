@@ -33,7 +33,7 @@ GAMMA = 0.9#单帧奖励计算折扣
 EPSILON = 0.1 # 裁剪范围
 BATCH_SIZE = 600 #一个batch内游戏次数
 EPOCHS = 10000 # Number of Epochs
-N_EPOCHS=10 #训练完一个batch后再迭代跟新的次数
+N_EPOCHS=5 #训练完一个batch后再迭代跟新的次数
 WARM_UP=1 #在训练初期, 非常容易死, 导致单次帧很少, 此时加大batch_size.
 
 ic() 
@@ -47,12 +47,12 @@ ic()
 # else:
 #     actor=PPO(1,7).to(device)
 #     critic=PPO(1,7).to(device)
-torch.manual_seed(0)
+torch.manual_seed(1223)
 model_path='./model.pth'
-if os.path.exists(model_path):
-    model=torch.load(model_path)
-else:
-    model=PPO(1,5).to(device)
+# if os.path.exists(model_path):
+#     model=torch.load(model_path)
+# else:
+model=PPO(1,5).to(device)
 # model=PPO(1,7).to(device)
 # for name, param in model.named_parameters():
 #     print(f"Parameter name: {name}, Device: {param.device}")
@@ -193,40 +193,11 @@ def train():
         # if epoch % 10 == 0:
         torch.save(model,model_path)
         
-def test():
-    state = env.custom_reset()
-    env.render=True
-    '''
-    一次从头到尾跑完一趟游戏, 多趟组成一个batchs
-    '''
-    batch_obs, batch_acts, batch_log_probs,batch_rews, batch_rtgs, batch_lens,batch_vals=[],[],[],[],[],[],[]
-    
-    state = env.custom_reset()
-    info= env.info
-    done=False
-    while not done:
-        # state = torch.from_numpy(np.concatenate(state, 0)).to(device).float()
-        # ic(state.shape)
-        state=state[:,:,:,-1].copy()
-        # ic(state.shape)
-        # state=state.transpose(2,0,1)
-        # ic(state.shape)
-        state=np.expand_dims(state,axis=0)
-        batch_obs.append(state)
-        logits,_=model(torch.FloatTensor(state).to(device))
-        # print(logits)
-        # batch_vals.append(value.detach())
-        policy=F.softmax(logits.detach(),dim=1)
-        #得到policy中,值最大的下标
-        action=torch.argmax(policy)
-        state,reward,done,info=env.custom_step(action.item())
-        ic(reward,info,action)
-        time.sleep(0.1)
 
 # if __name__ == '__main__':
 #     fire.Fire()
 train()
-test()
+
 
 
 

@@ -23,6 +23,7 @@ from gym.wrappers import GrayScaleObservation
 from nes_py.wrappers import JoypadSpace
 from stable_baselines3.common.vec_env import VecFrameStack, DummyVecEnv
 from icecream import ic
+import pdb
 
 class SkipFrame(gym.Wrapper):
     def __init__(self, env, skip):
@@ -103,13 +104,6 @@ class Customenv():
         self.render=render
         self.env=env
         self.state=self.env.reset()
-        self.score=0
-        self.coins=0
-        # state=state[:,:,0]*0.299+state[:,:,1]*0.587+state[:,:,2]*0.114
-        # self.state=state
-        # self.action_space=self.env.action_space
-        # self.num_states=self.state.shape[0]
-        # self.num_actions=self.action_space.n
 
         self._reinit__()
         
@@ -124,18 +118,23 @@ class Customenv():
     def _reinit__(self):
         # self.reward=0
         self.done=False
+        self.score=0
+        self.coins=0
         self.time=self.info['time']
         # self.deltatime=0
-        self.coins=self.info['coins']
+        # self.coins=self.info['coins']
         # self.deltacoins=0
         self.x_pos=self.info['x_pos']
         self.max_x_pos=self.x_pos
+        self.y_pos=self.info['y_pos']
+        # self.max_rew=5
+        # self.min_rew=-5
         # self.delta_x=0
     
     def custom_step(self,action):
         self.state,reward,self.done,info=self.env.step([action])
         info=info[0]
-        reward=reward.item()
+        rew=reward.item()
         reward=0
         # state=state[:,:,0]*0.299+state[:,:,1]*0.587+state[:,:,2]*0.114
         # self.state=state
@@ -151,23 +150,31 @@ class Customenv():
         self.score=info['score']
         # reward=deltacoins*10+deltatime+delta_x
         exceed_xpos=max(0,info['x_pos']-self.max_x_pos)
+        delta_y=info['y_pos']-self.y_pos
+        self.y_pos=info['y_pos']
         self.max_x_pos=max(self.max_x_pos,info['x_pos'])
         reward=exceed_xpos
-        reward+=np.log(delta_coins) if delta_coins>0 else 0
-        reward+=np.log(delta_score) if delta_score>0 else 0
+        reward+=delta_y if 0<delta_y<20 else 0#鼓励高跳
+        reward+=delta_coins if delta_coins>0 else 0
+        reward+=delta_score if delta_score>0 else 0
+
         if info['flag_get']:
-            reward+=500
+            reward+=100
         # if info['x_pos']>self.max_x_pos:
         #     self.max_x_pos=info['x_pos']
         # reward+=np.log(info['x_pos'])/40 if info['x_pos']!=0 else 0 #相同图像应该采取相同措施, 不应该加这个, 和动作不相关
         if self.done and info['time']>0 and info['flag_get']==False: #摔死的,碰死的
-            reward-=500
+            reward-=100
         # if self.done and info['time']==0: #如果时间到了但是没到终点
         #     reward-=10
         # if delta_x<=0.0:#如果没动
         #     reward-=10
         
-        reward=reward/10.0 if reward!=0.0 else 0
+        if reward>0:
+            reward=np.log(reward)
+        elif reward<0:
+            reward=-np.log(-reward)*10#往前波及几帧
+        # reward=reward/10.0 if reward!=0.0 else 0
         # reward=np.log(reward)/10 if reward>0.001 else 0
         # ic(reward)
         self.info=info

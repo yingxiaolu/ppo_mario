@@ -34,10 +34,10 @@ EPSILON = 0.1 # 裁剪范围
 EPOCHS = 10000 # Number of Epochs
 if sys.platform.startswith('linux'):
     N_EPOCHS=15 #训练完一个batch后再迭代跟新的次数
-    BATCH_SIZE= 200
+    BATCH_SIZE= 100
 else:
     N_EPOCHS=5
-    BATCH_SIZE = 200 #一个batch内游戏次数
+    BATCH_SIZE = 1 #一个batch内游戏次数
 ic(BATCH_SIZE,N_EPOCHS)
 WARM_UP=1 #在训练初期, 非常容易死, 导致单次帧很少, 此时加大batch_size.
 
@@ -57,7 +57,7 @@ model_path='./model.pth'
 # if os.path.exists(model_path):
 #     model=torch.load(model_path)
 # else:
-model=PPO(1,5).to(device)
+model=PPO(1,7).to(device)
 # model=PPO(1,7).to(device)
 # for name, param in model.named_parameters():
 #     print(f"Parameter name: {name}, Device: {param.device}")

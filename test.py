@@ -38,10 +38,10 @@ WARM_UP=1 #在训练初期, 非常容易死, 导致单次帧很少, 此时加大
 
 ic() 
 
-torch.manual_seed(0)
+torch.manual_seed(123)
 model_path='./model.pth'
 model=torch.load(model_path)
-# model=PPO(1,5).to(device)
+model=PPO(1,5).to(device)
     
 def test():
     state = env.custom_reset()

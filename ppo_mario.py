@@ -33,7 +33,7 @@ GAMMA = 0.9#单帧奖励计算折扣
 EPSILON = 0.1 # 裁剪范围
 EPOCHS = 10000 # Number of Epochs
 if sys.platform.startswith('linux'):
-    N_EPOCHS=15 #训练完一个batch后再迭代跟新的次数
+    N_EPOCHS=50 #训练完一个batch后再迭代跟新的次数
     BATCH_SIZE= 100
 else:
     N_EPOCHS=5

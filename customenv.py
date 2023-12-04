@@ -153,7 +153,8 @@ class Customenv():
         delta_y=info['y_pos']-self.y_pos
         self.y_pos=info['y_pos']
         self.max_x_pos=max(self.max_x_pos,info['x_pos'])
-        reward=exceed_xpos+deltatime
+        reward=-0.3
+        reward+=exceed_xpos
         # reward+=delta_y*4 if 0<delta_y<20 else 0#鼓励高跳
         reward+=delta_coins if delta_coins>0 else 0
         reward+=delta_score if delta_score>0 else 0
@@ -175,7 +176,7 @@ class Customenv():
         # elif reward<-1:
         #     reward=-np.log(-reward)*10#往前波及几帧
             
-        reward=reward/10.0 if reward!=0.0 else 0
+        reward=reward*0.1
         # reward=np.log(reward)/10 if reward>0.001 else 0
         # ic(reward)
         self.info=info

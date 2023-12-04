@@ -67,7 +67,7 @@ def test():
         #得到policy中,值最大的下标
         action=torch.argmax(policy)
         state,reward,done,info=env.custom_step(action.item())
-        # ic(reward,info,action)
+        ic(reward,info,action)
         reward_list.append(reward)
         time.sleep(0.1)
     print(reward_list)

@@ -25,7 +25,7 @@ class ResizeEnv(gym.ObservationWrapper):
     
 STAGE_NAME = 'SuperMarioBros-1-3-v0'
 env = gym_super_mario_bros.make(STAGE_NAME)
-MOVEMENT = [["A"],["NOOP"]]
+MOVEMENT = [["A"],["right","A","B"],["left","A"],["NOOP"]]
 env = JoypadSpace(env,MOVEMENT)
 env = GrayScaleObservation(env, keep_dim=True)
 env = ResizeEnv(env, size=84)

@@ -33,11 +33,11 @@ GAMMA = 0.9#单帧奖励计算折扣
 EPSILON = 0.1 # 裁剪范围
 EPOCHS = 10000 # Number of Epochs
 if sys.platform.startswith('linux'):
-    N_EPOCHS=50 #训练完一个batch后再迭代跟新的次数
+    N_EPOCHS=15 #训练完一个batch后再迭代跟新的次数
     BATCH_SIZE= 100
 else:
     N_EPOCHS=5
-    BATCH_SIZE = 1 #一个batch内游戏次数
+    BATCH_SIZE = 200 #一个batch内游戏次数
 ic(BATCH_SIZE,N_EPOCHS)
 WARM_UP=1 #在训练初期, 非常容易死, 导致单次帧很少, 此时加大batch_size.
 
@@ -149,12 +149,11 @@ def get_batchs_data(env,batch_size=BATCH_SIZE):
     
     return batch_obs, batch_acts, batch_log_probs,batch_rtgs, rewards, batch_lens,batch_vals,dones
       
-def train():
+def train(batch_size=BATCH_SIZE):
     state = env.custom_reset()
     warm_up=WARM_UP
     for epoch in range(EPOCHS):
         print(f'epoch:{epoch}')
-        batch_size=BATCH_SIZE
         if warm_up>=1:
             batch_size=BATCH_SIZE*warm_up
             warm_up-=1
@@ -203,9 +202,9 @@ def train():
         torch.save(model,model_path)
         
 
-# if __name__ == '__main__':
-#     fire.Fire()
-train()
+if __name__ == '__main__':
+    fire.Fire()
+
 
 
 

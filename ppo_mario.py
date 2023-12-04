@@ -206,7 +206,8 @@ def train(batch_timestep_numb=BATCH_TIMESTEP_NUMB):
         
 
 if __name__ == '__main__':
-    fire.Fire()
+    # fire.Fire()
+    train()
 
 
 

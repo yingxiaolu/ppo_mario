@@ -35,6 +35,7 @@ BATCH_SIZE = 600 #一个batch内游戏次数
 EPOCHS = 10000 # Number of Epochs
 N_EPOCHS=5 #训练完一个batch后再迭代跟新的次数
 WARM_UP=1 #在训练初期, 非常容易死, 导致单次帧很少, 此时加大batch_size.
+CHOOSE_COUNT=100 #先跑一百次,找比较好的次数.
 
 ic() 
 

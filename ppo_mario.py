@@ -18,12 +18,11 @@ import time
 
 # Model Param
 CHECK_FREQ_NUMB = 10000 #每训练多少帧保存一次模型
-TOTAL_TIMESTEP_NUMB = 500000 #总训练帧数
 N_STEPS = 512 # Number of steps to collect to train on
 EPISODE_NUMBERS = 20
 MAX_TIMESTEP_TEST = 1000
 
-
+BATCH_TIMESTEP_NUMB = 6000 #
 LEARNING_RATE = 0.00001 #学习率
 # GAE = 1.0   # 控制优势估计的偏差和方差
 ENT_COEF = 0.01 # Entropy Coefficient
@@ -33,13 +32,9 @@ GAMMA = 0.9#单帧奖励计算折扣
 EPSILON = 0.1 # 裁剪范围
 EPOCHS = 10000 # Number of Epochs
 if sys.platform.startswith('linux'):
-    N_EPOCHS=15 #训练完一个batch后再迭代跟新的次数
-    BATCH_SIZE= 100
+    BATCH_SIZE= 50
 else:
-    N_EPOCHS=5
-    BATCH_SIZE = 200 #一个batch内游戏次数
-ic(BATCH_SIZE,N_EPOCHS)
-WARM_UP=1 #在训练初期, 非常容易死, 导致单次帧很少, 此时加大batch_size.
+    N_EPOCHS=20
 
 ic() 
 
@@ -70,7 +65,7 @@ final_x_pos_list=[]
 timesteps_list=[]
 avge_final_xpos_in_one_batch=[]
 avge_reward_in_one_batch=[]
-def get_batchs_data(env,batch_size=BATCH_SIZE):
+def get_batchs_data(env,batch_timestep_numb):
     '''
     一次从头到尾跑完一趟游戏, 多趟组成一个batchs
     '''
@@ -79,7 +74,8 @@ def get_batchs_data(env,batch_size=BATCH_SIZE):
     final_state=None
     batch_final_x_pos=[]
     # barch_rew=[]
-    for i in range(batch_size):
+    cur_timesteps=0
+    while True:
         state = env.custom_reset()
         info= env.info
         done=False
@@ -109,12 +105,21 @@ def get_batchs_data(env,batch_size=BATCH_SIZE):
             rewards.append(reward)
             ep_rews.append(reward)
             timesteps.append(1)
+            cur_timesteps+=1
+            
+            if cur_timesteps>=batch_timestep_numb:
+                break
+            
         batch_final_x_pos.append(info['x_pos'])
         # ic(len(timesteps))
         timesteps_list.append(len(timesteps))
         batch_lens.append(len(timesteps))
         batch_rews.append(ep_rews)
         avge_reward_in_one_batch.append(np.mean(ep_rews))
+        
+        if cur_timesteps>=batch_timestep_numb:
+            break
+        
     final_x_pos_list+=batch_final_x_pos
     avge_final_xpos_in_one_batch.append(np.mean(batch_final_x_pos))
     batch_rtgs=[]
@@ -149,15 +154,11 @@ def get_batchs_data(env,batch_size=BATCH_SIZE):
     
     return batch_obs, batch_acts, batch_log_probs,batch_rtgs, rewards, batch_lens,batch_vals,dones
       
-def train(batch_size=BATCH_SIZE):
+def train(batch_timestep_numb=BATCH_TIMESTEP_NUMB):
     state = env.custom_reset()
-    warm_up=WARM_UP
     for epoch in range(EPOCHS):
         print(f'epoch:{epoch}')
-        if warm_up>=1:
-            batch_size=BATCH_SIZE*warm_up
-            warm_up-=1
-        batch_obs, batch_acts, batch_log_probs,batch_rtgs, rewards, batch_lens,batch_vals,dones=get_batchs_data(env,batch_size=batch_size)
+        batch_obs, batch_acts, batch_log_probs,batch_rtgs, rewards, batch_lens,batch_vals,dones=get_batchs_data(env,batch_timestep_numb)
         # ic(batch_obs.shape,batch_acts.shape,batch_log_probs.shape,batch_rtgs.shape,batch_vals.shape,len(rewards),len(batch_lens),len(dones))
         # l,r=100,120
         # print(batch_acts[l:r])
@@ -203,6 +204,7 @@ def train(batch_size=BATCH_SIZE):
         
 
 if __name__ == '__main__':
+    train()
     fire.Fire()
 
 

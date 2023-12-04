@@ -142,7 +142,7 @@ def get_batchs_data(env,batch_size=BATCH_SIZE):
     plt.plot(avge_final_xpos_in_one_batch,color='green')
     plt.legend(['avge_xpos_in_one_batch'])
     plt.subplot(4,1,4)
-    plt.plot(avge_reward_in_one_batch,color='yellow')
+    plt.plot(avge_reward_in_one_batch,color='black')
     plt.legend(['avge_reward_in_one_batch'])
     plt.savefig('./info.png')
     plt.close()

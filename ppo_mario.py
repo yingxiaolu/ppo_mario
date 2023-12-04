@@ -22,7 +22,7 @@ N_STEPS = 512 # Number of steps to collect to train on
 EPISODE_NUMBERS = 20
 MAX_TIMESTEP_TEST = 1000
 
-BATCH_TIMESTEP_NUMB = 6000 #
+
 LEARNING_RATE = 0.00001 #学习率
 # GAE = 1.0   # 控制优势估计的偏差和方差
 ENT_COEF = 0.01 # Entropy Coefficient
@@ -32,9 +32,11 @@ GAMMA = 0.9#单帧奖励计算折扣
 EPSILON = 0.1 # 裁剪范围
 EPOCHS = 10000 # Number of Epochs
 if sys.platform.startswith('linux'):
-    BATCH_SIZE= 50
+    N_EPOCHS= 50
+    BATCH_TIMESTEP_NUMB = 8000 #
 else:
     N_EPOCHS=20
+    BATCH_TIMESTEP_NUMB = 12000 #
 
 ic() 
 
@@ -204,7 +206,6 @@ def train(batch_timestep_numb=BATCH_TIMESTEP_NUMB):
         
 
 if __name__ == '__main__':
-    train()
     fire.Fire()
 
 

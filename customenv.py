@@ -170,11 +170,12 @@ class Customenv():
         # if delta_x<=0.0:#如果没动
         #     reward-=10
         
-        if reward>0:
-            reward=np.log(reward)
-        elif reward<0:
-            reward=-np.log(-reward)*10#往前波及几帧
-        # reward=reward/10.0 if reward!=0.0 else 0
+        # if reward>1:
+        #     reward=np.log(reward)
+        # elif reward<-1:
+        #     reward=-np.log(-reward)*10#往前波及几帧
+            
+        reward=reward/10.0 if reward!=0.0 else 0
         # reward=np.log(reward)/10 if reward>0.001 else 0
         # ic(reward)
         self.info=info

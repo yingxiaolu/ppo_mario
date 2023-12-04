@@ -23,9 +23,9 @@ class ResizeEnv(gym.ObservationWrapper):
             frame = frame[:,:,None]
         return frame
     
-STAGE_NAME = 'SuperMarioBros-1-1-v0'
+STAGE_NAME = 'SuperMarioBros-1-3-v0'
 env = gym_super_mario_bros.make(STAGE_NAME)
-MOVEMENT = [["A"],["right","A","B"],["right","A"],["left","A"],["NOOP"]]
+MOVEMENT = [["A"],["NOOP"]]
 env = JoypadSpace(env,MOVEMENT)
 env = GrayScaleObservation(env, keep_dim=True)
 env = ResizeEnv(env, size=84)
@@ -33,7 +33,7 @@ done = True
 reward_list=[]
 x_pos_list=[]
 time_list=[]
-for _ in range(100):
+for _ in range(1):
     for step in range(500000):
         if done: # Done will be true if Mario dies in the game
             state = env.reset()

@@ -154,7 +154,7 @@ class Customenv():
         self.y_pos=info['y_pos']
         self.max_x_pos=max(self.max_x_pos,info['x_pos'])
         reward=exceed_xpos
-        reward+=delta_y*2 if 0<delta_y<20 else 0#鼓励高跳
+        reward+=delta_y*4 if 0<delta_y<20 else 0#鼓励高跳
         reward+=delta_coins if delta_coins>0 else 0
         reward+=delta_score if delta_score>0 else 0
         # ic(reward,exceed_xpos,delta_y,delta_coins,delta_score)

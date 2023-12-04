@@ -92,7 +92,7 @@ class Customenv():
         STAGE_NAME = 'SuperMarioBros-1-1-v0'
         # MOVEMENT = [["A"],["right","A","B"],["right","A"],["left","A"],["NOOP"]]
         env = gym_super_mario_bros.make(STAGE_NAME)
-        env = JoypadSpace(env, SIMPLE_MOVEMENT)
+        env = JoypadSpace(env, RIGHT_ONLY)
         self.info=env.unwrapped._get_info()
         self.origin_info=self.info
         # env = CustomRewardAndDoneEnv(env)

@@ -57,7 +57,7 @@ model_path='./model.pth'
 # if os.path.exists(model_path):
 #     model=torch.load(model_path)
 # else:
-model=PPO(1,7).to(device)
+model=PPO(1,5).to(device)
 # model=PPO(1,7).to(device)
 # for name, param in model.named_parameters():
 #     print(f"Parameter name: {name}, Device: {param.device}")

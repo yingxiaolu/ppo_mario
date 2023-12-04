@@ -38,7 +38,7 @@ if sys.platform.startswith('linux'):
 else:
     N_EPOCHS=5
     BATCH_SIZE = 600 #一个batch内游戏次数
-
+ic(BATCH_SIZE,N_EPOCHS)
 WARM_UP=1 #在训练初期, 非常容易死, 导致单次帧很少, 此时加大batch_size.
 
 ic() 

@@ -37,7 +37,7 @@ if sys.platform.startswith('linux'):
     BATCH_SIZE= 200
 else:
     N_EPOCHS=5
-    BATCH_SIZE = 600 #一个batch内游戏次数
+    BATCH_SIZE = 200 #一个batch内游戏次数
 ic(BATCH_SIZE,N_EPOCHS)
 WARM_UP=1 #在训练初期, 非常容易死, 导致单次帧很少, 此时加大batch_size.
 
@@ -69,15 +69,16 @@ optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 final_x_pos_list=[]
 timesteps_list=[]
 avge_final_xpos_in_one_batch=[]
-
+avge_reward_in_one_batch=[]
 def get_batchs_data(env,batch_size=BATCH_SIZE):
     '''
     一次从头到尾跑完一趟游戏, 多趟组成一个batchs
     '''
-    global final_x_pos_list,timesteps_list,avge_final_xpos_in_one_batch
+    global final_x_pos_list,timesteps_list,avge_final_xpos_in_one_batch,avge_reward_in_one_batch
     batch_obs, batch_acts, batch_log_probs,batch_rews, rewards, batch_lens,batch_vals,dones=[],[],[],[],[],[],[],[]
     final_state=None
     batch_final_x_pos=[]
+    # barch_rew=[]
     for i in range(batch_size):
         state = env.custom_reset()
         info= env.info
@@ -113,7 +114,7 @@ def get_batchs_data(env,batch_size=BATCH_SIZE):
         timesteps_list.append(len(timesteps))
         batch_lens.append(len(timesteps))
         batch_rews.append(ep_rews)
-        
+        avge_reward_in_one_batch.append(np.mean(ep_rews))
     final_x_pos_list+=batch_final_x_pos
     avge_final_xpos_in_one_batch.append(np.mean(batch_final_x_pos))
     batch_rtgs=[]

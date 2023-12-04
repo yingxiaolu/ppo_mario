@@ -33,22 +33,23 @@ done = True
 reward_list=[]
 x_pos_list=[]
 time_list=[]
-for step in range(500000):
-    if done: # Done will be true if Mario dies in the game
-        state = env.reset()
-    action=env.action_space.sample() # Take a random action
-    # ic(action)
-    state, reward, done, info = env.step(action)
-    ic(action,state.shape, reward, done, info)
-    reward_list.append(reward)
-    x_pos_list.append(info['x_pos'])
-    time_list.append(info['time'])
-    # ic(state.shape, reward, done, info)
-    # _=input()
-    # time.sleep(0.1)
-    env.render() # If we are running the program in Colab we will need to comment the rendering of the environment. 
-    if done:
-        break
+for _ in range(100):
+    for step in range(500000):
+        if done: # Done will be true if Mario dies in the game
+            state = env.reset()
+        action=env.action_space.sample() # Take a random action
+        # ic(action)
+        state, reward, done, info = env.step(action)
+        ic(action,state.shape, reward, done, info)
+        reward_list.append(reward)
+        x_pos_list.append(info['x_pos'])
+        time_list.append(info['time'])
+        # ic(state.shape, reward, done, info)
+        # _=input()
+        # time.sleep(0.1)
+        env.render() # If we are running the program in Colab we will need to comment the rendering of the environment. 
+        if done:
+            break
 env.close()
 print(reward_list[-100:])
 print(x_pos_list[-100:])

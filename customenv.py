@@ -90,7 +90,7 @@ class CustomRewardAndDoneEnv(gym.Wrapper):
 class Customenv():
     def __init__(self,render=False):
         STAGE_NAME = 'SuperMarioBros-1-3-v0'
-        MOVEMENT = [ ['right', 'A', 'B'],['left', 'A'], ['right'],["A"],['NOOP']]
+        MOVEMENT = [["A"],["right","A","B"],["right","A"],["left","A"],["NOOP"]]
         env = gym_super_mario_bros.make(STAGE_NAME)
         env = JoypadSpace(env, MOVEMENT)
         self.info=env.unwrapped._get_info()
@@ -154,7 +154,7 @@ class Customenv():
         self.y_pos=info['y_pos']
         self.max_x_pos=max(self.max_x_pos,info['x_pos'])
         reward=exceed_xpos
-        reward+=delta_y*4 if 0<delta_y<20 else 0#鼓励高跳
+        # reward+=delta_y*4 if 0<delta_y<20 else 0#鼓励高跳
         reward+=delta_coins if delta_coins>0 else 0
         reward+=delta_score if delta_score>0 else 0
         # ic(reward,exceed_xpos,delta_y,delta_coins,delta_score)

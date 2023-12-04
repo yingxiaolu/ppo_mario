@@ -31,9 +31,14 @@ GAMMA = 0.9#单帧奖励计算折扣
 # LAMBDA = 0.95
 # TAU=1.0 #控制GAE的偏差和方差
 EPSILON = 0.1 # 裁剪范围
-BATCH_SIZE = 600 #一个batch内游戏次数
 EPOCHS = 10000 # Number of Epochs
-N_EPOCHS=5 #训练完一个batch后再迭代跟新的次数
+if sys.platform.startswith('linux'):
+    N_EPOCHS=15 #训练完一个batch后再迭代跟新的次数
+    BATCH_SIZE= 200
+else:
+    N_EPOCHS=5
+    BATCH_SIZE = 600 #一个batch内游戏次数
+
 WARM_UP=1 #在训练初期, 非常容易死, 导致单次帧很少, 此时加大batch_size.
 
 ic() 

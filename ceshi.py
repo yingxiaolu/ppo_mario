@@ -25,8 +25,8 @@ class ResizeEnv(gym.ObservationWrapper):
     
 STAGE_NAME = 'SuperMarioBros-1-1-v0'
 env = gym_super_mario_bros.make(STAGE_NAME)
-MOVEMENT = [["A"]]
-env = JoypadSpace(env, MOVEMENT)
+MOVEMENT = [["A"],["right","A","B"],["right","A"],["left","A"],["NOOP"]]
+env = JoypadSpace(env,MOVEMENT)
 env = GrayScaleObservation(env, keep_dim=True)
 env = ResizeEnv(env, size=84)
 done = True
@@ -45,7 +45,7 @@ for step in range(500000):
     time_list.append(info['time'])
     # ic(state.shape, reward, done, info)
     # _=input()
-    time.sleep(0.1)
+    # time.sleep(0.1)
     env.render() # If we are running the program in Colab we will need to comment the rendering of the environment. 
     if done:
         break
